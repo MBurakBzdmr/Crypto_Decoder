@@ -175,36 +175,53 @@ namespace kriptoloji_decoding
 
         private Panel BuildContentArea()
         {
-            // Sidebar 250px, ClientSize 1100x750 → content alanı 850x750.
-            // Anchor hesaplamaları doğru çalışsın diye panel boyutu dock öncesi ayarlanır.
             var content = new Panel
             {
                 Dock = DockStyle.Fill,
                 BackColor = ContentBg,
-                Size = new Size(850, 750)
+                Size = new Size(850, 650)
             };
+
+            // ── Başlık ve açıklama label'larının yüksekliğini font metriklerine göre hesapla ──
+            var titleFont = new Font("Segoe UI", 16f, FontStyle.Bold);
+            var descFont = new Font("Segoe UI", 9.5f);
+
+            // TextRenderer ile gerçek font yüksekliğini ölç (descender dahil)
+            int titleTextHeight = TextRenderer.MeasureText("Doğrusal Şifreleme", titleFont).Height;
+            int descTextHeight = TextRenderer.MeasureText("D(x) = a⁻¹ · (x − b) mod 29", descFont).Height;
+
+            // Ekstra padding ekle (harflerin kuyrukları kesilmesin)
+            int titleLabelHeight = titleTextHeight + 8;
+            int descLabelHeight = descTextHeight + 8;
+
+            int yPos = 14;
 
             _lblMethodTitle = new Label
             {
-                Font = new Font("Segoe UI", 16f, FontStyle.Bold),
+                Font = titleFont,
                 ForeColor = Color.FromArgb(33, 37, 41),
-                Location = new Point(30, 15),
-                Size = new Size(790, 36),
+                Location = new Point(30, yPos),
+                Size = new Size(790, titleLabelHeight),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
             content.Controls.Add(_lblMethodTitle);
 
+            yPos += titleLabelHeight + 2;
+
             _lblMethodDesc = new Label
             {
-                Font = new Font("Segoe UI", 9.5f),
+                Font = descFont,
                 ForeColor = Color.FromArgb(108, 117, 125),
-                Location = new Point(30, 52),
-                Size = new Size(790, 22),
+                Location = new Point(30, yPos),
+                Size = new Size(790, descLabelHeight),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
             content.Controls.Add(_lblMethodDesc);
 
-            content.Controls.Add(MakeSectionLabel("Şifreli Metin", 30, 90));
+            yPos += descLabelHeight + 6;
+
+            content.Controls.Add(MakeSectionLabel("Şifreli Metin", 30, yPos));
+            yPos += 26;
 
             _txtInput = new TextBox
             {
@@ -213,18 +230,21 @@ namespace kriptoloji_decoding
                 BackColor = CardBg,
                 ForeColor = Color.FromArgb(33, 37, 41),
                 BorderStyle = BorderStyle.FixedSingle,
-                Location = new Point(30, 115),
-                Size = new Size(790, 85),
+                Location = new Point(30, yPos),
+                Size = new Size(790, 80),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
                 ScrollBars = ScrollBars.Vertical
             };
             content.Controls.Add(_txtInput);
 
-            content.Controls.Add(MakeSectionLabel("Anahtar Parametreleri", 30, 215));
+            yPos += 80 + 14;
+
+            content.Controls.Add(MakeSectionLabel("Anahtar Parametreleri", 30, yPos));
+            yPos += 26;
 
             _panelKeyArea = new Panel
             {
-                Location = new Point(30, 240),
+                Location = new Point(30, yPos),
                 Size = new Size(790, 70),
                 BackColor = CardBg,
                 BorderStyle = BorderStyle.FixedSingle,
@@ -234,6 +254,8 @@ namespace kriptoloji_decoding
 
             CreateParamPanels();
 
+            yPos += 70 + 16;
+
             var btnCoz = new Button
             {
                 Text = "Ç  Ö  Z",
@@ -242,7 +264,7 @@ namespace kriptoloji_decoding
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(140, 44),
-                Location = new Point(30, 326),
+                Location = new Point(30, yPos),
                 Cursor = Cursors.Hand
             };
             btnCoz.FlatAppearance.BorderSize = 0;
@@ -258,7 +280,7 @@ namespace kriptoloji_decoding
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(110, 44),
-                Location = new Point(180, 326),
+                Location = new Point(180, yPos),
                 Cursor = Cursors.Hand
             };
             btnTemizle.FlatAppearance.BorderSize = 0;
@@ -266,7 +288,10 @@ namespace kriptoloji_decoding
             btnTemizle.Click += (_, _) => { _txtInput.Clear(); _txtOutput.Clear(); };
             content.Controls.Add(btnTemizle);
 
-            content.Controls.Add(MakeSectionLabel("Çözülmüş Metin", 30, 386));
+            yPos += 44 + 20;
+
+            content.Controls.Add(MakeSectionLabel("Çözülmüş Metin", 30, yPos));
+            yPos += 26;
 
             _txtOutput = new TextBox
             {
@@ -276,8 +301,8 @@ namespace kriptoloji_decoding
                 BackColor = Color.FromArgb(232, 245, 233),
                 ForeColor = Color.FromArgb(27, 94, 32),
                 BorderStyle = BorderStyle.FixedSingle,
-                Location = new Point(30, 411),
-                Size = new Size(790, 290),
+                Location = new Point(30, yPos),
+                Size = new Size(790, 150),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ScrollBars = ScrollBars.Vertical
             };
